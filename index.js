@@ -1,6 +1,5 @@
 const getPixels = require('get-pixels')
 const getRgbaPalette = require('get-rgba-palette')
-const chroma = require('chroma-js')
 const getSvgColors = require('get-svg-colors')
 const pify = require('pify')
 
@@ -37,9 +36,12 @@ function paletteFromBitmap (filename, type, callback) {
 
   getPixels(filename, type, function (err, pixels) {
     if (err) return callback(err)
-    const palette = getRgbaPalette(pixels.data, 5).map(function (rgba) {
-      return chroma(rgba)
-    })
+    // palette.bins(pixels[, count, quality, filter])
+    const palette = getRgbaPalette.bins(pixels.data, 5)
+      .map(({ color, amount }) => ({
+        rgb: color,
+        amount
+      }))
 
     return callback(null, palette)
   })
